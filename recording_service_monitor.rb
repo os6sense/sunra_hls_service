@@ -1,7 +1,8 @@
+require_relative 'monitor'
 require_relative 'recording_service'
 require 'forwardable'
 
-class RecordingServiceMonitor
+class RecordingServiceMonitor < Monitor
   extend Forwardable
 
   def_delegators :@rs, :m3u8,

@@ -1,4 +1,10 @@
-This would be better as a submodule (most of the services would be?)
+[![Code Climate](https://codeclimate.com/github/os6sense/sunra_hls_service/badges/gpa.svg)](https://codeclimate.com/github/os6sense/sunra_hls_service)
+
+Work in progress. Unusable atm.
+
+Used in conjunction with sunra_ffserver_relay and sunra_recording_service,
+this hls service provides a simple mechanism for creating live HLS streams. All
+that is needed on the web side is a webserver and ssh access.
 
 The intent of the HLS service is that a live stream of a session can be made 
 available at will. Access to the HLS stream will require providing a URL to
@@ -43,4 +49,8 @@ Design Notes:
  - I really want this to be more modular and have additional functionality 
    outside of Sunra and as a generic way of creating HLS streams. 
       - monitor should be interchangable
+      - would be useful if the recording_service could be configured to NOT
+       require a booking or any of the "sunra" project management side of the
+       service.
+      - Multiple bitrates/resolution support should be added in the near future
 
