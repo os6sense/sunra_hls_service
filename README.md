@@ -1,16 +1,13 @@
 [![Code Climate](https://codeclimate.com/github/os6sense/sunra_hls_service/badges/gpa.svg)](https://codeclimate.com/github/os6sense/sunra_hls_service)
 
-Work in progress. Unusable atm.
+==== WORK IN PROGRESS. UNUSABLE ATM.
 
 Used in conjunction with sunra_ffserver_relay and sunra_recording_service,
-this hls service provides a simple mechanism for creating live HLS streams. All
+this service provides a simple mechanism for creating live HLS streams. All
 that is needed on the web side is a webserver and ssh access.
 
-The intent of the HLS service is that a live stream of a session can be made 
-available at will. Access to the HLS stream will require providing a URL to
-the viewers and hence should probably be a different upload target to that of
-the "download" after service media (since this may or may not be password 
-protected via different details).
+The intent of the HLS service is that a live stream can be made available at
+will. Access to the HLS stream will require providing a URL to the viewers 
 
 BASIC OPERATION:
 
