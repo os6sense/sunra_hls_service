@@ -1,4 +1,7 @@
-require "sunra_logging"
+require 'sunra_logging'
+require 'stringio'
+
+# TODO: need to gemify this.
 require_relative '../../lib/sftp_uploader'
 
 class HLSUploader
@@ -9,13 +12,14 @@ class HLSUploader
   attr_accessor :project_id,
                 :booking_id
 
+  # ==== Description
   # Create a new uploader.
   #
   # === Params
   # +config+ :: A config object which supplies details to access the server
   # +destination_presenter+ :: An object which when passed the path and
   # filename returns a string containing the destination directory and filename
-  # on the remote server.
+  # on the remote server for the m3u8 file and media segments.
   def initialize(config, destination_presenter = nil)
     @dest_pres = destination_presenter
     @sftp = SFTPUploader.new(config.hls_server_address,
@@ -25,10 +29,12 @@ class HLSUploader
     @uploaded = []
   end
 
+  # ==== Description
   def clear_uploaded
     @uploaded = []
   end
 
+  # ==== Description
   # Upload all the media_segments contained in an m3u8 file to the server.
   # Note that the uploader will keep track of which files have been uploaded
   # and will not upload a file with the same name twice.
@@ -45,29 +51,27 @@ class HLSUploader
     end
   end
 
+  # ==== Description
   # upload the m3u8 file. Note that it is the *parsed* file which is uploaded
   # which allows us to generate a sliding window for live streams.
   def upload_m3u8(pathname, parser, sliding = false)
     parser.load(pathname)
-    @sftp.upload(source, destination(pathname.dirname, pathname.basename))
+
+    if sliding
+      parser.slide!(@uploaded)
+      @sftp.upload_io(StringIO.new(parser.to_s),
+                      destination(pathname.dirname, pathname.basename))
+    else
+      @sftp.upload(source, destination(pathname.dirname, pathname.basename))
+    end
+
     logger.info "uploading_m3u8 #{pathname}"
   end
 
+  # ==== Description
   def destination(pathname, file)
     return @dest_pres.destination(pathname.dirname, file) if @dest_pres
     file.to_s
-  end
-
-  private
-
-  # From the source m3u8 file we need to generate a sliding window
-  # m3u8 file that tracks the number of files removed and has the
-  # correct duration to match the spec
-  def upload_sliding_m3u8(pathname, parser, sliding = false)
-    parser.load(pathname)
-    parser.slide!(@uploaded)
-
-    @sftp.upload_io(parser, destination(pathname.dirname, pathname.basename))
   end
 end
 
