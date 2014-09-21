@@ -1,8 +1,5 @@
 require_relative 'file_monitor'
-require_relative 'recording_service_monitor'
-require_relative 'hls_uploader'
 require_relative 'm3u8_parser'
-require_relative 'destination_presenter'
 
 require 'sunra_config/hls'
 require 'sunra_logging'
@@ -15,27 +12,30 @@ class M3U8Monitor
   # file has been generated.
   attr_accessor :max_delay
 
-  def initialize(config, monitor)
+  def initialize(config, monitor, &block)
     @config = config
     @monitor = monitor
+    @block = block
 
     @max_delay = 100
   end
 
-  def start
+  def start(ignore=false)
     @_stopped = false
 
     @monitor.start do
+      @block.call(self)
+#      yield
       # TODO - this block should be yielded to allow for a custom destination
       # presenter to be injected
-      dest_pres = SunraArchiveDestinationPresenter.new
-      dest_pres.set_ids(@monitor)
+      #dest_pres = SunraArchiveDestinationPresenter.new
+      #dest_pres.set_ids(@monitor)
 
-      @uploader = HLSUploader.new(@config, dest_pres)
+      #@uploader = HLSUploader.new(@config, dest_pres)
 
-      m3u8_pathname = @monitor.m3u8 # its possible when the recording stops for
-                                    # the result of a call to m3u8 to be nil
-      monitor_m3u8_file(m3u8_pathname, @uploader)
+      #m3u8_pathname = @monitor.m3u8 # its possible when the recording stops for
+                                    ## the result of a call to m3u8 to be nil
+      #monitor_m3u8_file(m3u8_pathname, @uploader)
     end
 
     start unless @_stopped # loop
@@ -46,12 +46,15 @@ class M3U8Monitor
     @monitor.stop
   end
 
-  private
-
   def monitor_m3u8_file(m3u8_pathname, uploader)
+    if m3u8_pathname.nil?
+      logger.warn 'm3u8_pathname is nil in call to monitor_m3u8_file'
+      return nil
+    end
+
     delay_start(m3u8_pathname) # allow time for the m3u8 to be written.
 
-    m3u8_parser = M3U8Parser.new
+    m3u8_parser = M3U8Parser.new(m3u8_pathname)
 
     FileMonitor.add_watch(m3u8_pathname) do
       uploader.upload_ts(m3u8_pathname, m3u8_parser)
@@ -83,7 +86,6 @@ end
 if $PROGRAM_NAME == __FILE__
   config = Sunra::Config::HLS
 
-  puts config.recording_server_api_key
   rsm = RecordingServiceMonitor.new(config.recording_server_api_key,
                                     config.recording_server_rest_url)
   monitor = M3U8Monitor.new(config, rsm)
