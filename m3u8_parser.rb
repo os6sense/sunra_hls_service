@@ -1,7 +1,6 @@
 require 'm3uzi2'
 
-# Very lazy and ineffficient reloading and reading of the M3U8 file
-# via a wrapper around M3Uzi.
+# Read and reload the the M3U8 file # via a wrapper around M3Uzi2.
 class M3U8Parser
   extend Forwardable
 
@@ -15,10 +14,11 @@ class M3U8Parser
 
   def load(path_and_filename)
     @parser = M3Uzi2::M3Uzi2.new(path_and_filename)
-
     @parser.read_method = :flock
-    # Sometimes the m3u8 file will be being written too just as we attempt
-    # to read it, flocking doesnt always solve this
+
+    # Sometimes the m3u8 file will be being written to just as we attempt to
+    # read it, flocking doesnt always solve this and M3Uzi2 is likely to fail
+    # when reading it hence we retry.
     begin
       @parser.load
     rescue

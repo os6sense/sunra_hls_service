@@ -1,13 +1,11 @@
-# 'abstract' base class, mainly used to make it easy
-# to adapt the HLS service by documenting the required
-# methods
+# 'abstract' base class, mainly used to make it easy to adapt the HLS service
+# by documenting the required methods
 #
 class Monitor
-
-  # The Start method of a monitor should be called to begin any
-  # process that should be true before any attempt is made to monitor
-  # the M3U8 File. If all you want to do is monitor an M3U8 file
-  # just use the M3U8 monitor directly and yield within start
+  # The Start method of a monitor should be called to begin any process that
+  # should be true before any attempt is made to monitor the M3U8 File. If all
+  # you want to do is monitor an M3U8 file just use the M3U8 monitor directly
+  # and yield within start
   def start(&block)
     fail "Monitor#start not implemented"
     # e.g.  yield

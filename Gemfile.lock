@@ -26,9 +26,9 @@ GEM
       rack (~> 1.4)
       rack-protection (~> 1.4)
       tilt (~> 1.3, >= 1.3.4)
-    sunra_config (0.0.20)
+    sunra_config (0.0.22)
     sunra_logging (0.0.4)
-    sunra_service (0.0.1)
+    sunra_service (0.0.2)
     tilt (1.4.1)
 
 PLATFORMS

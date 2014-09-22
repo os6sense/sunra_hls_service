@@ -1,5 +1,7 @@
+
 # A destination presenter is used to return a custom destination for the file
-# based on the path and filename.
+# based on the path and filename. The class name of the presenter is
+# configured in the config file (/etc/sunra/hls_uploader.cfg).
 class DestinationPresenter
   # ==== Description
   # ==== Params

@@ -1,4 +1,5 @@
 require_relative '../../lib/sunra_rest_client'
+
 require 'pathname'
 
 # Access the recording service and provide convienience methods to:
