@@ -2,7 +2,7 @@ require 'sunra_logging'
 require 'stringio'
 require 'sunra_config/hls'
 
-require 'pry-byebug'
+# require 'pry-byebug'
 
 # TODO: need to gemify this.
 require_relative '../../lib/sftp_uploader'
