@@ -42,18 +42,20 @@ module Sunra
       # Note that the uploader will keep track of which files have been
       # uploaded and will not upload a file with the same name twice.
       #
-      # This may be a problem ... clear uploads?
+      # returns: the list of files just uploaded as an array in the format
+      # [[local, destdir, filename]]
       def upload_ts(pathname, parser)
         parser.load(pathname)
+        return_list = []
 
-        # parser.files.select { | p | ! @uploaded.include?(p.path) }
-        #  .each do | file |
         segments_for_upload(parser) do | file |
           source = "#{pathname.dirname}/#{file}"
           fail "Sourcefile #{file} not found" unless File.exist?(source)
           @sftp.upload(source, destination(pathname.dirname, file))
           @uploaded << file.path
+          return_list << [pathname.dirname, file]
         end
+        return_list
       end
 
       # ==== Description

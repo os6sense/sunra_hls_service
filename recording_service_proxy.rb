@@ -41,7 +41,7 @@ module Sunra
 
     # ==== Description
     # Provides a simple
-    class RecordingService
+    class RecordingServiceProxy
       # ==== Params
       # +rest_client+ :: A client which respinds to get messages to return
       # json responses from the recording server.
@@ -121,14 +121,14 @@ module Sunra
 end
 
 # Live example
-if $PROGRAM_NAME == __FILE__
-  # NB:
-  rc = Sunra::HLS::RecordingService.create_client('rRTzQQPqCyazDmNnTxrC',
-                            'http://localhost/recording_service/status/')
-  rs = Sunra::HLS::RecordingService.new(rc)
-  puts rs.is_recording?
-  puts rs.m3u8
-  puts rs.m3u8(true)
-  puts rs.project_id
-  puts rs.booking_id
-end
+#if $PROGRAM_NAME == __FILE__
+  ## NB:
+  #rc = Sunra::HLS::RecordingService.create_client('rRTzQQPqCyazDmNnTxrC',
+                            #'http://localhost/recording_service/status/')
+  #rs = Sunra::HLS::RecordingService.new(rc)
+  #puts rs.is_recording?
+  #puts rs.m3u8
+  #puts rs.m3u8(true)
+  #puts rs.project_id
+  #puts rs.booking_id
+#end

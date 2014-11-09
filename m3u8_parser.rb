@@ -40,6 +40,10 @@ end
 if $PROGRAM_NAME == __FILE__
   parser = M3U8Parser.new("/mnt/RAID/VIDEO/NEWSessions/da5d3b742663d7dbbfceac16d0f15fdfbf561eb22e5192faf07268ccc89bd53d70489a7a/55/hls/2014-08-18-095925.M3U8")
   puts parser.files
+  parser.files.each do | file |
+    puts file.to_s
+  end
+
   puts parser.finished?
-  puts parser.to_s
+  #puts parser.to_s
 end

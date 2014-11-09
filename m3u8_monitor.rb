@@ -8,6 +8,9 @@ include Sunra::Utils
 
 module Sunra
   module HLS
+    # ==== Description
+    # monitors an m3u8 file for changes.
+    # and performs actions when changed.
     class M3U8Monitor
       include Sunra::Utils::Logging
 
@@ -16,9 +19,11 @@ module Sunra
       # file has been generated.
       attr_accessor :max_delay
 
-      def initialize(config, monitor, &block)
+      def initialize(config, monitor, event_handler, &block)
         @config = config
         @monitor = monitor
+        @event_handler = event_handler
+
         @block = block
 
         @max_delay = 100
@@ -35,9 +40,13 @@ module Sunra
         @monitor.stop
       end
 
-      def monitor_m3u8_file(m3u8_pathname, uploader)
+      def monitor_m3u8_file(m3u8_pathname,
+                            uploader,
+                            upload_m3u8 = true,
+                            event_handler = nil)
+
         if m3u8_pathname.nil?
-          logger.warn 'm3u8_pathname is nil in call to monitor_m3u8_file'
+          logger.error 'm3u8_pathname is nil in call to monitor_m3u8_file'
           return nil
         end
 
@@ -46,13 +55,16 @@ module Sunra
         m3u8_parser = M3U8Parser.new(m3u8_pathname)
 
         FileMonitor.add_watch(m3u8_pathname) do
-          uploader.upload_ts(m3u8_pathname, m3u8_parser)
-          uploader.upload_m3u8(m3u8_pathname, m3u8_parser, true)
+          uploaded = uploader.upload_ts(m3u8_pathname, m3u8_parser)
+          uploader.upload_m3u8(m3u8_pathname, m3u8_parser, true) if upload_m3u8
+
+          event_handler.files_uploaded(m3u8_parser, uploaded) if event_handler
 
           if m3u8_parser.finished? || @monitor.is_recording? == false
             logger.info "Stopping FileMonitor (p: #{m3u8_parser.finished?}, "\
                         "m: #{ @monitor.is_recording? })"
             FileMonitor.stop
+            event_handler.stopped if event_handler
           end
         end
 
@@ -75,7 +87,7 @@ module Sunra
 end
 
 if $PROGRAM_NAME == __FILE__
-  config = Sunra::Config::HLS
+  config = Sunra::Utils::Config::HLS
   rsm = RecordingServiceMonitor.new(config.recording_server_api_key,
                                     config.recording_server_rest_url)
   monitor = M3U8Monitor.new(config, rsm)
