@@ -1,15 +1,15 @@
 require_relative 'file_monitor'
 require_relative 'm3u8_parser'
 
-require 'sunra_config/hls'
-require 'sunra_logging'
+require 'sunra_utils/config/hls'
+require 'sunra_utils/logging'
 
 include Sunra::Utils
 
 module Sunra
   module HLS
     class M3U8Monitor
-      include SunraLogging
+      include Sunra::Utils::Logging
 
       # Maximum number of seconds to wait before beggining to monitor the M3U8
       # file for changes. Useful if the file is not written until the first ts

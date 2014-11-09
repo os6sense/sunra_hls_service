@@ -8,8 +8,8 @@
 # monitored for changes. When a change is detected the media segments and a new
 # slinding M3U8 file is uplaoded to the server.
 
-require 'sunra_config/hls'
-require 'sunra_service'
+require 'sunra_utils/config/hls'
+require 'sunra_utils/service'
 
 require_relative 'hls_uploader'
 require_relative 'destination_presenter'
@@ -17,7 +17,7 @@ require_relative 'm3u8_monitor'
 require_relative 'recording_service_monitor'
 
 include Sunra::Utils::Service
-include Sunra::Config
+include Sunra::Utils::Config
 include Sunra::HLS
 
 service_name = 'hls_service.rb'

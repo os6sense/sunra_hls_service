@@ -1,4 +1,4 @@
-require_relative '../../lib/sunra_rest_client'
+require 'sunra_utils/rest_client'
 
 require 'pathname'
 

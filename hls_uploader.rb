@@ -1,16 +1,14 @@
-require 'sunra_logging'
 require 'stringio'
-require 'sunra_config/hls'
+require 'sunra_utils/config/hls'
+require 'sunra_utils/logging'
 
-# require 'pry-byebug'
 
-# TODO: need to gemify this.
-require_relative '../../lib/sftp_uploader'
+require 'sunra_utils/sftp_uploader'
 
 module Sunra
   module HLS
     class Uploader
-      include SunraLogging
+      include Sunra::Utils::Logging
 
       attr_reader :uploaded
 
