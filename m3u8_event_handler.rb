@@ -7,30 +7,39 @@ require_relative 'delivery_service_proxy'
 # webcast is beggining or ending, or that a new segment is available
 # for a webcast in progress.
 class M3U8EventHandler
-  def create_delivery_service_proxy(class_name)
+  attr_reader :webcast_id
+
+  def self.create_delivery_service_proxy(config)
     DeliveryServiceProxy.new(
-      DeliveryServiceProxy.create_client(HLS.hls_delivery_server_api_key,
-                                         HLS.hls_delivery_server_rest_url))
+      DeliveryServiceProxy.create_client(config.hls_delivery_server_api_key,
+                                         config.hls_delivery_server_rest_url))
   end
 
   def initialize
-    @delivery_service_proxy = create_delivery_service_proxy('')
+    @dsp = self.class.create_delivery_service_proxy('')
+    @project_id, @booking_id, @webcast_id = nil, nil, nil
   end
 
   def started
-
+    @session_id = @dsp.notify_session_start(@webcast_id)['id']
   end
 
   def stopped
-
+    @dsp.notify_session_end(@webcast_id, @session_id)
   end
 
   def files_uploaded(m3u8_parser, uploaded)
-
+    @dsp.notify_hls_file(@webcast_id, @session_id, uploaded)
   end
 
   def set_ids(monitor)
-    @project_id = monitor.project_id if monitor.respond_to?(:project_id)
-    @booking_id = monitor.booking_id if monitor.respond_to?(:booking_id)
+    return unless monitor.respond_to?(:project_id) && monitor.respond_to?(:booking_id)
+    @project_id, @booking_id = monitor.project_id, monitor.booking_id
+
+    # The webcast PROJECT should have been (manually) created by this point
+    # hence we should be able to obtain a webcast id.
+    if @project_id && @booking_id
+      @webcast_id = DeliveryServiceProxy.webcast_id(@project_id, @booking_id)
+    end
   end
 end

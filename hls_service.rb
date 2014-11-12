@@ -21,36 +21,58 @@ include Sunra::Utils::Service
 include Sunra::Utils::Config
 include Sunra::HLS
 
+class HLSService
+  attr_accessor :destination_presenter,
+                :rs_monitor,
+                :event_handler
+
+  def initialize
+    @destination_presenter = create_presenter(HLS.presenter_class)
+    @rs_monitor = create_recording_service_monitor(HLS.monitor_class)
+    @event_handler = M3U8EventHandler.new(HLS)
+  end
+
+  # Create a new M3U8Monitor, which does the heavy lifting of responding to
+  # changes in the recording service, creating a file monitor to watch the
+  # m3u8 file for changes, and then calling the uploader to upload files
+  # based on those changes.
+  def create_monitor
+    M3U8Monitor.new(HLS, rs_monitor, event_handler) do | m3u8 |
+      set_ids
+      m3u8.upload_m3u8 = HLS.upload_m3u8_file
+      m3u8.monitor_m3u8_file(@rs_monitor.m3u8,
+                             Uploader.new(HLS, @destination_presenter))
+    end
+  end
+
+  private
+
+  # ==== Description
+  # Dynamic presenter to allow for easy changes to logic for where the uploads
+  # should be located.
+  def create_presenter(class_name)
+    Object.const_get(class_name).new
+  end
+
+  # ==== Description
+  # Dynamic monitor to allow for easy changes to the 'trigger' for when a
+  # m3u8 file should be monitored.
+  def create_recording_service_monitor(class_name)
+    Object.const_get(class_name).new(HLS.recording_server_api_key,
+                                     HLS.recording_server_rest_url)
+  end
+
+  # ==== Description
+  # helper, project and booking id (if needed) are OBTAINED from the rs_monitor
+  def set_ids
+    @destination_presenter.set_ids(@rs_monitor)
+    @event_handler.set_ids(@rs_monitor)
+  end
+
+end
+
 service_name = 'hls_service.rb'
 usage service_name if ARGV.length != 1
 
-# ==== Description
-# Dynamic presenter to allow for easy changes to logic for where the uploads
-# should be located.
-def create_presenter(class_name)
-  Object.const_get(class_name).new
-end
-
-# ==== Description
-# Dynamic monitor to allow for easy changes to the 'trigger' for when a
-# m3u8 file should be monitored.
-def create_recording_service_monitor(class_name)
-  Object.const_get(class_name).new(HLS.recording_server_api_key,
-                                   HLS.recording_server_rest_url)
-end
-
-destination_presenter = create_presenter(HLS.presenter_class)
-rs_monitor = create_recording_service_monitor(HLS.monitor_class)
-event_handler = M3U8EventHandler.new
-
-m3u8_monitor = M3U8Monitor.new(HLS, rs_monitor, event_handler) do | m3u8 |
-  destination_presenter.set_ids(rs_monitor)
-  event_handler.set_ids(rs_monitor)
-  uploader = Uploader.new(HLS, destination_presenter)
-
-  m3u8.monitor_m3u8_file(rs_monitor.m3u8,
-                         uploader,
-                         HLS.upload_m3u8_file)
-end
-
-run(m3u8_monitor, ARGV[0], service_name)
+hls_service = HLSService.new
+run(hls_service.create_monitor, ARGV[0], service_name)

@@ -48,12 +48,13 @@ module Sunra
         parser.load(pathname)
         return_list = []
 
-        segments_for_upload(parser) do | file |
-          source = "#{pathname.dirname}/#{file}"
-          fail "Sourcefile #{file} not found" unless File.exist?(source)
-          @sftp.upload(source, destination(pathname.dirname, file))
-          @uploaded << file.path
-          return_list << [pathname.dirname, file]
+        segments_for_upload(parser) do | media_segment |
+          source = "#{pathname.dirname}/#{media_segment}"
+          fail "Sourcefile #{media_segment} not found" unless File.exist?(source)
+          @sftp.upload(source, destination(pathname.dirname, media_segment))
+          @uploaded << media_segment.path
+
+          return_list << [pathname.dirname, media_segment, source]
         end
         return_list
       end
