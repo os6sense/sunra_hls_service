@@ -24,15 +24,18 @@ module Sunra
 
       # ==== Description
       # Obtain a webcast id if we know the project and booking_id
-      def self.webcast_id(project_id, booking_id)
+      def webcast_id(project_id, booking_id)
         result = JSON.parse(@rest_client
           .get('lookup.json', {project_id: project_id, booking_id: booking_id}))
 
-        result.empty? ? [] : result.map { | wc | wc['id'] }
+        # a booking should only ever have a single webcast id associated
+        result.empty? ? nil : result[0]['id'] # : result.map { | wc | wc['id'] }
       end
 
       # ==== Description
-      # TODO: Create a new webcast PROJECT.
+      # TODO: Create a new webcast PROJECT - this is likely to be used
+      # by the project manager hence this proxy should probably move to
+      # sunra_utils - sunra_utils/proxys?
       def create_webcast(webcast_details_hash)
         @webcast_id = 1
         # check if already exists
@@ -46,7 +49,7 @@ module Sunra
       # Returns: The session_id returned from creating the session
       def notify_session_start(webcast_id)
         url = "#{webcast_id}/sessions.json"
-        @session_id = JSON.parse @rest_client.create(url, {})
+        @session_id = JSON.parse(@rest_client.create(url, {}))['id']
       end
 
       # ==== Description
@@ -88,7 +91,7 @@ if $PROGRAM_NAME == __FILE__
   dsp = Sunra::HLS::DeliveryServiceProxy.new(dsp_client)
 
   # webcast create
-  # session_id = dsp.notify_session_start(2)['id']
+  # session_id = dsp.notify_session_start(2)#['id']
   #
   # webcast end
 #  dsp.notify_session_end(2, session_id)

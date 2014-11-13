@@ -57,7 +57,9 @@ module Sunra
       # The block within add_watch will be called whenever the file pointed
       # to by m3u8_pathname changes in anyway.
       def add_file_monitor_watch(m3u8_pathname, m3u8_parser)
+
         FileMonitor.add_watch(m3u8_pathname) do
+
           perform_uploads(m3u8_pathname, m3u8_parser)
 
           if m3u8_parser.finished? || @monitor.is_recording? == false
@@ -77,6 +79,7 @@ module Sunra
       # set) the m3u8 file
       def perform_uploads(m3u8_pathname, m3u8_parser)
         uploaded = @uploader.upload_ts(m3u8_pathname, m3u8_parser)
+        return unless uploaded.size > 0
         @uploader.upload_m3u8(m3u8_pathname, m3u8_parser, true) if @upload_m3u8
         @event_handler.files_uploaded(m3u8_parser, uploaded) if @event_handler
       end

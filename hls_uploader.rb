@@ -1,8 +1,7 @@
 require 'stringio'
+
 require 'sunra_utils/config/hls'
 require 'sunra_utils/logging'
-
-
 require 'sunra_utils/sftp_uploader'
 
 module Sunra
@@ -25,10 +24,10 @@ module Sunra
       # filename on the remote server for the m3u8 file and media segments.
       def initialize(config, destination_presenter = nil)
         @dest_pres = destination_presenter
-        @sftp = SFTPUploader.new(config.hls_server_address,
-                                 config.sftp_username,
-                                 config.hls_base_directory,
-                                 config.sftp_password)
+        @sftp = Sunra::Utils::SFTP::Uploader.new(config.hls_server_address,
+                                                 config.sftp_username,
+                                                 config.hls_base_directory,
+                                                 config.sftp_password)
         @uploaded = []
       end
 

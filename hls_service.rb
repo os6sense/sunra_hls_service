@@ -39,6 +39,7 @@ class HLSService
   def create_monitor
     M3U8Monitor.new(HLS, rs_monitor, event_handler) do | m3u8 |
       set_ids
+      event_handler.started if event_handler
       m3u8.upload_m3u8 = HLS.upload_m3u8_file
       m3u8.monitor_m3u8_file(@rs_monitor.m3u8,
                              Uploader.new(HLS, @destination_presenter))
