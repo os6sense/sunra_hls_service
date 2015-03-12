@@ -42,7 +42,7 @@ module Sunra
       # uploaded and will not upload a file with the same name twice.
       #
       # returns: the list of files just uploaded as an array in the format
-      # [[local, destdir, filename]]
+      # [[source, destination, media_segment/filename]]
       def upload_ts(pathname, parser)
         parser.load(pathname)
         return_list = []
@@ -53,7 +53,9 @@ module Sunra
           @sftp.upload(source, destination(pathname.dirname, media_segment))
           @uploaded << media_segment.path
 
-          return_list << [pathname.dirname, media_segment, source]
+          return_list << [source,
+                          destination(pathname.dirname, media_segment),
+                          media_segment]
         end
         return_list
       end

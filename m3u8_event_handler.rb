@@ -25,15 +25,18 @@ class M3U8EventHandler
   end
 
   def started
+    return nil unless @webcast_id
     @session_id = @dsp.notify_session_start(@webcast_id)
     logger.info "notify_session_start - Session ID: #{@session_id}"
   end
 
   def stopped
+    return nil unless @webcast_id && @session_id
     @dsp.notify_session_end(@webcast_id, @session_id)
   end
 
   def files_uploaded(m3u8_parser, uploaded_media_segments)
+    return nil unless @webcast_id && @session_id
     logger.info "Notifying of #{uploaded_media_segments.size} Media Segments "
     uploaded_media_segments.each do | media_segment |
       if @webcast_id && @session_id

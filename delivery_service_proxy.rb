@@ -1,3 +1,5 @@
+
+require 'digest/crc32'
 require 'sunra_utils/rest_client'
 require 'sunra_utils/config/hls'
 require 'sunra_utils/logging'
@@ -62,13 +64,14 @@ module Sunra
       # ==== Description
       # Notify the delivery server that a new hls file has been uploaded.
       def notify_hls_file(webcast_id, session_id, file)
-        directory, media_segment, _source = *file
+        source, destination, media_segment = *file
 
         data = { session_id: session_id,
                  filename: media_segment.to_s ,
-                 directory: directory,
-                 filesize: '10000',
-                 duration: media_segment.duration,
+                 directory: destination,
+                 filesize: File.size?(source).to_s,
+                 duration: media_segment.duration.to_s,
+                 crc: Digest::CRC32.file(source).hexdigest,
                  format: 'ts' }
 
         url = "#{webcast_id}/sessions/#{session_id}/hls_files.json"

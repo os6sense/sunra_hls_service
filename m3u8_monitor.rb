@@ -23,6 +23,9 @@ module Sunra
       attr_reader :uploader
 
       # ==== Description
+      # Note that the block is passed in the initializer since the monitor
+      # is run as a service hence the block cannot be directly passed to
+      # +start+
       def initialize(config, monitor, event_handler, &block)
         @config, @monitor, @event_handler = config, monitor, event_handler
         @block = block
@@ -30,7 +33,7 @@ module Sunra
       end
 
       # ==== Description
-      def start(ignore=false)
+      def start(_ignore=false)
         @_stopped = false
         @monitor.start { @block.call(self) }
         start unless @_stopped # loop
@@ -63,7 +66,7 @@ module Sunra
           perform_uploads(m3u8_pathname, m3u8_parser)
 
           if m3u8_parser.finished? || @monitor.is_recording? == false
-            logger.info "Stopping FileMonitor."
+            logger.info 'Stopping FileMonitor.'
             logger.debug "(parser: #{m3u8_parser.finished?}, "\
                          "monitor: #{ @monitor.is_recording? })"
             FileMonitor.stop

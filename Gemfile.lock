@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     diff-lcs (1.2.5)
+    digest-crc (0.4.1)
     fakefs (0.6.0)
     ffi (1.9.6)
     m3uzi2 (1.0.0)
@@ -33,6 +34,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  digest-crc
   fakefs
   m3uzi2
   rb-inotify
